@@ -1,0 +1,14 @@
+<mvc:View controllerName="com.bharath.dynamicritchtexteditor.controller.mainView"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+        <content>
+        <ComboBox id="idCB"
+				items="{/Categories}" selectionChange="onSelectionChange">
+				<core:Item key="{CategoryID}" text="{CategoryName}" />
+		</ComboBox>
+        <Panel id="idDetailsPanel">
+        </Panel>
+        </content>
+    </Page>
+</mvc:View>
