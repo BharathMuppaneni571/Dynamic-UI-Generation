@@ -1,1 +1,21 @@
 /* Enter your custom styles here */
+.sapMBtnGhost {
+    background-image: none;
+    border-color: transparent;
+    background-color: transparent;
+    color: transparent;
+}
+
+.sapMBtnGhost {
+    color: transparent;
+    border: transparent;
+    background: transparent;
+}
+
+.sapMBtnGhost.sapMBtnInner {
+    text-shadow: none;
+}
+
+.sapUiSizeCompact .sapMBtnGhost {
+    text-shadow: none;
+}

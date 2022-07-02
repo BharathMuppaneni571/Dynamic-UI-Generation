@@ -2,16 +2,30 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/richtexteditor/RichTextEditor",
     "sap/m/Button",
-    "sap/m/MessageBox"
+    "sap/m/MessageBox",
+    "sap/m/Panel",
+    "sap/m/Toolbar",
+    "sap/m/OverflowToolbar",
+    "sap/m/Title",
+    "sap/m/ToolbarSpacer",
+    "sap/m/HBox",
+    "sap/m/VBox",
+    "sap/ui/core/CustomData",
+    "sap/m/FormattedText"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, RichTextEditor, Button, MessageBox) {
+    function (Controller, RichTextEditor, Button, MessageBox, Panel, Toolbar, OverflowToolbar, Title, ToolbarSpacer, HBox, VBox, CustomData, FormattedText) {
         "use strict";
 
         return Controller.extend("com.bharath.dynamicritchtexteditor.controller.mainView", {
             onInit: function () {
+            },
+
+            getValue: function () {
+                var noOfNodesToBeMade = this.getView().byId("inputId").getValue();
+                this.createRTENode(noOfNodesToBeMade);
             },
 
             onSelectionChange: function (oEvent) {
@@ -19,108 +33,190 @@ sap.ui.define([
                 var that = this;
                 oModel.read("/Categories", {
                     success: function (data) {
-                        // debugger;
                         var length = data.results.length;
                         that.createRTENode(length);
                     },
                     error: function (error) {
-                        debugger;
+                        MessageBox.error("error: ", error.stringify());
                     }
                 });
             },
 
-            createRTENode: function (length) {
+            getNewId: function () {
+                return jQuery.sap.uid();
+            },
+
+            createLayout: function (panelHeader, data) {
+                var panelId1 = this.getNewId(),
+                    panelId2 = this.getNewId(),
+                    panelId3 = this.getNewId(),
+                    RTEId1 = this.getNewId(),
+                    RTEId2 = this.getNewId(),
+                    redButtonId = this.getNewId(),
+                    yellowButtonId = this.getNewId(),
+                    greenButtonId = this.getNewId();
                 var that = this;
-                var data = "<p>Paragraph</p> <b>bharath</b> ";
-                //creating entry
 
-                var id1 = jQuery.sap.uid();
-                var id2 = jQuery.sap.uid();
+                return new Panel(panelId1, {
+                    content: [
+                        new Toolbar({
+                            content: [
+                                new OverflowToolbar({
+                                    style: "Clear",
+                                    width: "65%", //adjust this as per the required button position
+                                    content: [
+                                        new Title({
+                                            text: panelHeader
+                                        })]
+                                }),
+                            ]
+                        }),
 
-                
-                 //adding buttons
-                 var Button1 = new Button({
-                    text: "Red",
-                    type: sap.m.ButtonType.Reject,
-                    press: "onRedPress"
+                        new HBox({
+                            justifyContent: "Inherit",
+                            items: [
+                                new VBox({
+                                    width: "100%",
+                                    items: [
+                                        new Panel(panelId2, {
+                                            content: [
+                                                new FormattedText({
+                                                    htmlText: "<div style='padding-bottom:12px !important'>Ammababoi</div></br>"
+                                                }),
+                                                new Button({    //using this just for proper alignment
+                                                    text: "",
+                                                    type: sap.m.ButtonType.Ghost,
+                                                    enabled: false
+                                                }),
+                                                new ToolbarSpacer(),
+                                                new RichTextEditor(RTEId1, {
+                                                    width: "95%",
+                                                    value: data,
+                                                    busy: true,
+                                                    ready: function (oEvent) { oEvent.getSource().setBusy(false); }
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                new VBox({
+                                    width: "100%",
+                                    items: [
+                                        new Panel(panelId3, {
+                                            content: [
+                                                new Button(redButtonId, {
+                                                    text: "Red",
+                                                    type: sap.m.ButtonType.Reject,
+                                                    press: function (oEvent) { that.onRedPress(oEvent); },
+                                                    customData: [
+                                                        new CustomData({ key: "RTEid1", value: RTEId1 }),
+                                                        new CustomData({ key: "RTEid2", value: RTEId2 })
+                                                    ]
+                                                }),
+                                                new Button(yellowButtonId, {
+                                                    text: "Yellow",
+                                                    type: sap.m.ButtonType.Attention,
+                                                    press: function (oEvent) { that.onYellowPress(oEvent) },
+                                                    customData: [
+                                                        new CustomData({ key: "RTEid1", value: RTEId1 }),
+                                                        new CustomData({ key: "RTEid2", value: RTEId2 })
+                                                    ]
+                                                }),
+                                                new Button(greenButtonId, {
+                                                    text: "Green",
+                                                    type: sap.m.ButtonType.Accept,
+                                                    press: function (oEvent) { that.onGreenPress(oEvent) },
+                                                    customData: [
+                                                        new CustomData({ key: "RTEid1", value: RTEId1 }),
+                                                        new CustomData({ key: "RTEid2", value: RTEId2 })
+                                                    ]
+                                                }),
+                                                new ToolbarSpacer(),
+
+                                                new RichTextEditor(RTEId2, {
+                                                    width: "95%",
+                                                    editable: false,
+                                                    busy: true,
+                                                    ready: function (oEvent) { oEvent.getSource().setBusy(false); }
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                })]
+                        })]
                 });
-                Button1.data("id1", id1);
-                Button1.data("id2", id2);
-                that.getView().byId("idDetailsPanel").addContent(Button1);
 
-                var Button2 = new Button({
-                    text: "Yellow",
-                    type: sap.m.ButtonType.Critical,
-                    press: function (oEvent) {
-                        that.onYellowPress(oEvent);
-                    }
-                });
-                Button2.data("id1", id1);
-                Button2.data("id2", id2);
-                that.getView().byId("idDetailsPanel").addContent(Button2);
+            },
 
-                var Button3 = new Button({
-                    text: "Green",
-                    type: sap.m.ButtonType.Accept,
-                    press: "onGreenPress"
-                });
-                Button3.data("id1", id1);
-                Button3.data("id2", id2);
-                that.getView().byId("idDetailsPanel").addContent(Button3);
+            createRTENode: function (noOfNodesToBeMade) {
+                // destroying existing content first if any
+                try {
+                    var entries = this.getView().byId("idScrollContainer").getContent();
+                    entries.forEach(function (RTEditor) {
+                        RTEditor.destroy();
+                    });
+                } catch (error) {
+                    MessageBox.error("Unable to destroy existing instances of RitchText Editor instances!");
+                }
 
+                var that = this;
 
-                that.oRichTextEditor = new RichTextEditor(id1, {
-                    width: "45%",
-                    height: "45%",
-                    customToolbar: true,
-                    showGroupFont: true,
-                    showGroupLink: true,
-                    showGroupInsert: true,
-                    value: data,
-                    ready: function () {
-                        this.addButtonGroup("styleselect").addButtonGroup("table");
-                    }
-                });
+                for (var i = 1; i <= noOfNodesToBeMade; i++) {
+                    //Creating Panel
+                    var panelHeader = "Panel" + i;
+                    var testData = "<p>Hi this is</p> <b>Bharath</b>" + i;
+                    var panelInstance = this.createLayout(panelHeader, testData);
 
-                that.oRichTextEditor1 = new RichTextEditor(id2, {
-                    width: "45%",
-                    height: "45%",
-                    customToolbar: true,
-                    showGroupFont: true,
-                    showGroupLink: true,
-                    showGroupInsert: true,
-                    editable: false,
-                    value: data,
-                    ready: function () {
-                        this.addButtonGroup("styleselect").addButtonGroup("table");
-                    }
-                });
+                    //adding panel to scroll controller
+                    that.getView().byId("idScrollContainer").addContent(panelInstance);
+                }
+            },
 
+            onRedPress: function (oEvent) {
+                oEvent.getSource().setIcon("sap-icon://message-error");
+                var RTEId1 = oEvent.getSource().data("RTEid1"),
+                    RTEId2 = oEvent.getSource().data("RTEid2");
 
-                //adding element to screen
-                that.getView().byId("idDetailsPanel").addContent(that.oRichTextEditor);
-                that.getView().byId("idDetailsPanel").addContent(that.oRichTextEditor1);
+                var ritchTextEditorValue = encodeURIComponent(sap.ui.getCore().byId(RTEId1).getValue());
+                if (ritchTextEditorValue) {
+                    var appendMessage = "<p>" + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
+                        + "Time: " + Date() +
+                        " : RED"
+                        + "</p>";
+
+                    sap.ui.getCore().byId(RTEId2).setValue(appendMessage + decodeURIComponent(ritchTextEditorValue));
+                }
             },
 
             onYellowPress: function (oEvent) {
-                try {
-                    var id1 = oEvent.getSource().data("id1");
-                    var id2 = oEvent.getSource().data("id2");
-                    var ritchTextEditorValue = encodeURIComponent(sap.ui.getCore().byId(id1).getValue());
+                oEvent.getSource().setIcon("sap-icon://message-warning");
+                var RTEId1 = oEvent.getSource().data("RTEid1"),
+                    RTEId2 = oEvent.getSource().data("RTEid2");
 
-                    if (ritchTextEditorValue) {
-                        var appendMessage = "<p>" + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
-                            + "Time: " + Date() +
-                            " : Yellow"
-                            +"</p>";
+                var ritchTextEditorValue = encodeURIComponent(sap.ui.getCore().byId(RTEId1).getValue());
+                if (ritchTextEditorValue) {
+                    var appendMessage = "<p>" + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
+                        + "Time: " + Date() +
+                        " : YELLOW"
+                        + "</p>";
 
-                        sap.ui.getCore().byId(id2).setValue(appendMessage + decodeURIComponent(ritchTextEditorValue));
+                    sap.ui.getCore().byId(RTEId2).setValue(appendMessage + decodeURIComponent(ritchTextEditorValue));
+                }
+            },
 
-                    }
-                    // }
-                    debugger;
-                } catch (error) {
-                    MessageBox.error(error.toString());
+            onGreenPress: function (oEvent) {
+                oEvent.getSource().setIcon("sap-icon://message-success");
+                var RTEId1 = oEvent.getSource().data("RTEid1"),
+                    RTEId2 = oEvent.getSource().data("RTEid2");
+
+                var ritchTextEditorValue = encodeURIComponent(sap.ui.getCore().byId(RTEId1).getValue());
+                if (ritchTextEditorValue) {
+                    var appendMessage = "<p>" + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
+                        + "Time: " + Date() +
+                        " : GREEN"
+                        + "</p>";
+
+                    sap.ui.getCore().byId(RTEId2).setValue(appendMessage + decodeURIComponent(ritchTextEditorValue));
                 }
             }
         });
