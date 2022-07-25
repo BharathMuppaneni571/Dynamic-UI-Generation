@@ -11,12 +11,13 @@ sap.ui.define([
     "sap/m/HBox",
     "sap/m/VBox",
     "sap/ui/core/CustomData",
-    "sap/m/FormattedText"
+    "sap/m/FormattedText",
+    "sap/m/TextArea"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, RichTextEditor, Button, MessageBox, Panel, Toolbar, OverflowToolbar, Title, ToolbarSpacer, HBox, VBox, CustomData, FormattedText) {
+    function (Controller, RichTextEditor, Button, MessageBox, Panel, Toolbar, OverflowToolbar, Title, ToolbarSpacer, HBox, VBox, CustomData, FormattedText, TextArea) {
         "use strict";
 
         return Controller.extend("com.bharath.dynamicritchtexteditor.controller.mainView", {
@@ -89,11 +90,27 @@ sap.ui.define([
                                                     enabled: false
                                                 }),
                                                 new ToolbarSpacer(),
-                                                new RichTextEditor(RTEId1, {
+                                                // new RichTextEditor(RTEId1, {
+                                                //     width: "95%",
+                                                //     value: data,
+                                                //     busy: true,
+                                                //     ready: function (oEvent) { oEvent.getSource().setBusy(false); }
+                                                // })
+                                                new TextArea(RTEId1,{
                                                     width: "95%",
-                                                    value: data,
-                                                    busy: true,
-                                                    ready: function (oEvent) { oEvent.getSource().setBusy(false); }
+                                                    height: "150px",
+                                                    maxLength: 200,
+                                                    showExceededText: true, 
+                                                    liveChange: function(oEvent){ 
+                                                         var ref = oEvent.getSource();
+                                                            if (ref.getValue().length > ref.getMaxLength()) {
+                                                            ref.setValue(ref.getLastValue());
+                                                            ref.setValueState("Error");
+                                                            } else {
+                                                            ref.setValueState("None");
+                                                            }
+                                                    },
+                                                    value: data                                                      
                                                 })
                                             ]
                                         })
@@ -133,11 +150,17 @@ sap.ui.define([
                                                 }),
                                                 new ToolbarSpacer(),
 
-                                                new RichTextEditor(RTEId2, {
+                                                // new RichTextEditor(RTEId2, {
+                                                //     width: "95%",
+                                                //     editable: false,
+                                                //     busy: true,
+                                                //     ready: function (oEvent) { oEvent.getSource().setBusy(false); }
+                                                // })
+                                                new TextArea(RTEId2,{
                                                     width: "95%",
+                                                    height: "150px",
                                                     editable: false,
-                                                    busy: true,
-                                                    ready: function (oEvent) { oEvent.getSource().setBusy(false); }
+                                                    value: data                                                      
                                                 })
                                             ]
                                         })
@@ -164,7 +187,8 @@ sap.ui.define([
                 for (var i = 1; i <= noOfNodesToBeMade; i++) {
                     //Creating Panel
                     var panelHeader = "Panel" + i;
-                    var testData = "<p>Hi this is</p> <b>Bharath</b>" + i;
+                    // var testData = "<p>Hi this is</p> <b>Bharath</b>" + i;
+                    var testData = "Hi this is Bharath" + i;
                     var panelInstance = this.createLayout(panelHeader, testData);
 
                     //adding panel to scroll controller
@@ -179,10 +203,13 @@ sap.ui.define([
 
                 var ritchTextEditorValue = encodeURIComponent(sap.ui.getCore().byId(RTEId1).getValue());
                 if (ritchTextEditorValue) {
-                    var appendMessage = "<p>" + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
-                        + "Time: " + Date() +
-                        " : RED"
-                        + "</p>";
+                    // var appendMessage = "<p>" + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
+                    //     + "Time: " + Date() +
+                    //     " : RED"
+                    //     + "</p>";
+                    var appendMessage = " " + "sap.ushell.Container.getService('UserInfo').getUser().getFullName "
+                    + "Time: " + Date() +
+                    " : RED";
 
                     sap.ui.getCore().byId(RTEId2).setValue(appendMessage + decodeURIComponent(ritchTextEditorValue));
                 }
